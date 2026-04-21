@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽卡系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-single {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-ten {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .card-display {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .card {
+            width: 400px;
+            height: 550px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .card-gold {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+            border: 5px solid #ffaa00;
+        }
+
+        .card-purple {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 50%, #9b59b6 100%);
+            border: 5px solid #7d3c98;
+        }
+
+        .card-blue {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #3498db 100%);
+            border: 5px solid #1a5276;
+        }
+
+        .card-icon {
+            width: 280px;
+            height: 280px;
+            margin-bottom: 20px;
+            object-fit: contain;
+            filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .card-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .card-rarity {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .progress-text {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .next-btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .exit-btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .exit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .stats h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .stats-value {
+            font-weight: bold;
+        }
+
+        .gold-text { color: #ffaa00; }
+        .purple-text { color: #9b59b6; }
+        .blue-text { color: #3498db; }
+
+        @keyframes flipIn {
+            0% {
+                transform: rotateY(90deg) scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: rotateY(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .card-animate {
+            animation: flipIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 抽卡系统</h1>
+        
+        <div class="buttons" id="mainButtons">
+            <button class="btn btn-single" onclick="startGacha(1)">单抽</button>
+            <button class="btn btn-ten" onclick="startGacha(10)">十连抽</button>
+        </div>
+
+        <div class="card-display" id="cardDisplay">
+            <div class="progress-text" id="progressText"></div>
+            <div class="card" id="card" onclick="showNextCard()">
+                <div class="card-number" id="cardNumber"></div>
+                <img class="card-icon" id="cardIcon" src="" alt="card">
+                <div class="card-name" id="cardName"></div>
+                <div class="card-rarity" id="cardRarity"></div>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button class="next-btn" onclick="showNextCard()">下一张</button>
+                <button class="exit-btn" onclick="exitGacha()">退出</button>
+            </div>
+        </div>
+
+        <div class="stats" id="stats">
+            <h3>📊 抽卡统计</h3>
+            <div class="stats-item">
+                <span>总抽数：</span>
+                <span class="stats-value" id="totalPulls">0</span>
+            </div>
+            <div class="stats-item">
+                <span class="gold-text">金卡：</span>
+                <span class="stats-value gold-text" id="goldCount">0</span>
+            </div>
+            <div class="stats-item">
+                <span class="purple-text">紫卡：</span>
+                <span class="stats-value purple-text" id="purpleCount">0</span>
+            </div>
+            <div class="stats-item">
+                <span class="blue-text">蓝卡：</span>
+                <span class="stats-value blue-text" id="blueCount">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 卡池配置
+        const cardPool = {
+            gold: {
+                name: '传说卡',
+                rarity: '★★★★★',
+                image: 'entry/src/main/resources/base/media/card_gold.png',
+                class: 'card-gold',
+                probability: 0.01
+            },
+            purple: {
+                name: '史诗卡',
+                rarity: '★★★★',
+                image: 'entry/src/main/resources/base/media/card_purple.jpg',
+                class: 'card-purple',
+                probability: 0.19
+            },
+            blue: {
+                name: '稀有卡',
+                rarity: '★★★',
+                image: 'entry/src/main/resources/base/media/card_blue.png',
+                class: 'card-blue',
+                probability: 0.80
+            }
+        };
+
+        // 统计数据
+        let stats = {
+            total: 0,
+            gold: 0,
+            purple: 0,
+            blue: 0
+        };
+
+        // 当前抽卡结果
+        let currentCards = [];
+        let currentIndex = 0;
+
+        // 抽卡函数
+        function gacha() {
+            const rand = Math.random();
+            let cumulative = 0;
+            
+            for (const [type, card] of Object.entries(cardPool)) {
+                cumulative += card.probability;
+                if (rand < cumulative) {
+                    return { type, ...card };
+                }
+            }
+            
+            return { type: 'blue', ...cardPool.blue };
+        }
+
+        // 开始抽卡
+        function startGacha(count) {
+            currentCards = [];
+            currentIndex = 0;
+            
+            for (let i = 0; i < count; i++) {
+                const card = gacha();
+                currentCards.push(card);
+                stats.total++;
+                stats[card.type]++;
+            }
+            
+            document.getElementById('mainButtons').style.display = 'none';
+            document.getElementById('cardDisplay').style.display = 'flex';
+            document.getElementById('stats').style.display = 'block';
+            
+            updateStats();
+            showCard(0);
+        }
+
+        // 显示卡牌
+        function showCard(index) {
+            if (index >= currentCards.length) {
+                exitGacha();
+                return;
+            }
+            
+            const card = currentCards[index];
+            const cardElement = document.getElementById('card');
+            
+            // 移除旧的动画类
+            cardElement.classList.remove('card-animate');
+            cardElement.classList.remove('card-gold', 'card-purple', 'card-blue');
+            
+            // 强制重绘
+            void cardElement.offsetWidth;
+            
+            // 添加新的类和动画
+            cardElement.classList.add(card.class, 'card-animate');
+            
+            document.getElementById('cardIcon').src = card.image;
+            document.getElementById('cardName').textContent = card.name;
+            document.getElementById('cardRarity').textContent = card.rarity;
+            document.getElementById('cardNumber').textContent = `${index + 1}/${currentCards.length}`;
+            document.getElementById('progressText').textContent = 
+                currentCards.length === 1 ? '恭喜获得！' : `第 ${index + 1} 张 / 共 ${currentCards.length} 张`;
+        }
+
+        // 显示下一张卡牌
+        function showNextCard() {
+            currentIndex++;
+            if (currentIndex >= currentCards.length) {
+                exitGacha();
+            } else {
+                showCard(currentIndex);
+            }
+        }
+
+        // 退出抽卡
+        function exitGacha() {
+            document.getElementById('mainButtons').style.display = 'flex';
+            document.getElementById('cardDisplay').style.display = 'none';
+            currentCards = [];
+            currentIndex = 0;
+        }
+
+        // 更新统计
+        function updateStats() {
+            document.getElementById('totalPulls').textContent = stats.total;
+            document.getElementById('goldCount').textContent = stats.gold;
+            document.getElementById('purpleCount').textContent = stats.purple;
+            document.getElementById('blueCount').textContent = stats.blue;
+        }
+    </script>
+</body>
+</html>
